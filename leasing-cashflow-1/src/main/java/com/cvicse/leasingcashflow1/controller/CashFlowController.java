@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @CrossOrigin
@@ -22,12 +21,10 @@ public class CashFlowController {
 
     private static final Logger logger = LoggerFactory.getLogger(CashFlowController.class);
 
-
-    @PostMapping
-    public Map<String,CashFlow> getCashFlows(@RequestBody List<String> cashFlowIds){
+    @GetMapping
+    public List<CashFlow> getCashFlows(){
         logger.info("get all cashFlows");
-        return cashFlowService.getCashFlowsByids(cashFlowIds);
-        //return cashFlowService.getAllCashFlows();
+        return cashFlowService.getAllCashFlows();
     }
 
     @GetMapping("/{id}")
