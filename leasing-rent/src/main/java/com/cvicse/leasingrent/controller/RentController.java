@@ -25,7 +25,7 @@ public class RentController {
     private static final Logger logger = LoggerFactory.getLogger(RentController.class);
 
     @PostMapping("/new")
-    public RentSchedule createRentSchedule(@RequestBody JSONObject params
+    public RentSchedule createRentSchedule(@RequestBody JSONArray params
     ,@RequestParam(value = "contractId",defaultValue = "null") String contractId){
         logger.info("create RentSchedule");
         return rentService.createRentSchedule(params,contractId);
