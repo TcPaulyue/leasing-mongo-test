@@ -17,9 +17,9 @@ public class RentCell {
     private double principalVAT;     //本金增值税
     private double interestVAT;     //利息增值税
 
-    private double handlingFee;     //手续费
-    private double margin;     //保证金
-    private double purchasePrice;  //留购价款
+//    private double handlingFee;     //手续费
+//    private double margin;     //保证金
+//    private double purchasePrice;  //留购价款
 
     private double XIRR;     //XIRR
     private double IRR;    //IRR
@@ -55,9 +55,9 @@ public class RentCell {
         return excludingTaxXIRR;
     }
 
-    public double getHandlingFee() {
-        return handlingFee;
-    }
+//    public double getHandlingFee() {
+//        return handlingFee;
+//    }
 
     public double getInterest() {
         return interest;
@@ -71,17 +71,17 @@ public class RentCell {
         return IRR;
     }
 
-    public double getMargin() {
-        return margin;
-    }
+//    public double getMargin() {
+//        return margin;
+//    }
 
     public double getPrincipalVAT() {
         return principalVAT;
     }
 
-    public double getPurchasePrice() {
-        return purchasePrice;
-    }
+//    public double getPurchasePrice() {
+//        return purchasePrice;
+//    }
 
     public double getRemainingPrincipal() {
         return remainingPrincipal;
@@ -123,10 +123,10 @@ public class RentCell {
         this.excludingTaxXIRR = excludingTaxXIRR;
     }
 
-    public void setHandlingFee(double handlingFee) {
-        this.handlingFee = handlingFee;
-    }
-
+//    public void setHandlingFee(double handlingFee) {
+//        this.handlingFee = handlingFee;
+//    }
+//
     public void setInterest(double interest) {
         this.interest = interest;
     }
@@ -139,10 +139,10 @@ public class RentCell {
         this.IRR = IRR;
     }
 
-    public void setMargin(double margin) {
-        this.margin = margin;
-    }
-
+//    public void setMargin(double margin) {
+//        this.margin = margin;
+//    }
+//
     public void setPayDate(DateTime payDate) {
         this.payDate = payDate;
     }
@@ -151,10 +151,10 @@ public class RentCell {
         this.principalVAT = principalVAT;
     }
 
-    public void setPurchasePrice(double purchasePrice) {
-        this.purchasePrice = purchasePrice;
-    }
-
+//    public void setPurchasePrice(double purchasePrice) {
+//        this.purchasePrice = purchasePrice;
+//    }
+//
     public void setRemainingPrincipal(double remainingPrincipal) {
         this.remainingPrincipal = remainingPrincipal;
     }

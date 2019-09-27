@@ -28,7 +28,7 @@ public class RentService {
     private BasicElementsRepository basicElementsRepository;
 
     @Autowired
-    private RentScheduleRepository rentScheduleRepository;
+    private RentScheduleRepository mainRentScheduleRepository;
 
     @Autowired
     private Javers javers;
@@ -42,13 +42,13 @@ public class RentService {
      * @return
      */
     public RentSchedule getRentScheduleById(String id){
-        return rentScheduleRepository.findById(id).get();
+        return mainRentScheduleRepository.findById(id).get();
     }
 
 
     public RentSchedule getRentScheduleByContractId(String contractId){
-        if(this.rentScheduleRepository.findRentScheduleByContractId(contractId).isPresent()){
-            return rentScheduleRepository.getRentScheduleByContractId(contractId);
+        if(this.mainRentScheduleRepository.findRentScheduleByContractId(contractId).isPresent()){
+            return mainRentScheduleRepository.getRentScheduleByContractId(contractId);
         }else return null;
     }
     /**
@@ -57,8 +57,8 @@ public class RentService {
      * @return  返回租金计划表的列表
      */
     public List<RentSchedule> deleteRentScheduleById(String id){
-        rentScheduleRepository.deleteById(id);
-        return rentScheduleRepository.findAll();
+        mainRentScheduleRepository.deleteById(id);
+        return mainRentScheduleRepository.findAll();
     }
 
     /**
@@ -66,7 +66,16 @@ public class RentService {
      * @return 返回租金计划表的列表
      */
     public List<RentSchedule> getRentSchedules(){
-        return rentScheduleRepository.findAll();
+        return mainRentScheduleRepository.findAll();
+    }
+    
+    
+    public List<BasicElements> getBasicElementList(JSONArray jsonArray){
+        List<BasicElements> basicElementsList = new ArrayList<>();
+        for(int i=0;i<jsonArray.size();i++){
+            basicElementsList.add(this.getBasicElements(jsonArray.getJSONObject(i)));
+        }
+        return basicElementsList;
     }
 
     /**
@@ -103,21 +112,37 @@ public class RentService {
      * @param params
      * @return
      */
-    public RentSchedule createRentSchedule(JSONObject params,String contractId){
-        BasicElements basicElements = this.getBasicElements(params);
-        basicElementsRepository.save(basicElements);
-        String algTemplate = basicElements.getAlgTemplate();
-        RentSchedule rentSchedule = new ModelFactory().getBasicModel(algTemplate,basicElements);
-        rentSchedule.setContractId(contractId);
-        this.saveRentSchedule(rentSchedule);
-        return rentSchedule;
+    public RentSchedule createRentSchedule(JSONArray params,String contractId){
+        List<BasicElements> basicElementsList = this.getBasicElementList(params);
+        BasicElements mainBasicElements = basicElementsList.get(0);
+        RentSchedule mainRentSchedule = new ModelFactory().getBasicModel(mainBasicElements.getAlgTemplate()
+        ,mainBasicElements);
+        basicElementsList.remove(mainBasicElements);
+        for(BasicElements basicElements:basicElementsList){
+            String algTemplate = basicElements.getAlgTemplate();
+            RentSchedule rentSchedule = new ModelFactory().getBasicModel(algTemplate,basicElements);
+            //todo
+        }
+        mainRentSchedule = this.setElementsExcludingRentCells(mainRentSchedule);
+        mainRentSchedule.setContractId(contractId);
+        mainRentSchedule.setName(mainRentSchedule.getId());
+        
+        this.saveRentSchedule(mainRentSchedule);
+        return mainRentSchedule;
     }
 
-    public RentSchedule calculateRentSchedule(JSONObject params){
+    public RentSchedule calculateRentSchedule(JSONObject params,String withmargin){
         BasicElements basicElements = this.getBasicElements(params);
         String algTemplate = basicElements.getAlgTemplate();
-        RentSchedule rentSchedule = new ModelFactory().getBasicModel(algTemplate,basicElements);
-        return rentSchedule;
+        RentSchedule mainRentSchedule = new ModelFactory().getBasicModel(algTemplate,basicElements);
+        mainRentSchedule = this.setElementsExcludingRentCells(mainRentSchedule);
+        if(withmargin.equals(true))
+            return mainRentSchedule;
+        else
+        {
+            mainRentSchedule.rentCells.remove(0);
+            return mainRentSchedule;
+        }
     }
 
     /**
@@ -129,27 +154,64 @@ public class RentService {
     public RentSchedule updateRentScheduleById(String id,JSONObject params){
         BasicElements basicElements = this.getBasicElements(params);
         String algTemplate = basicElements.getAlgTemplate();
-        RentSchedule rentScheduleTemp = new ModelFactory().getBasicModel(algTemplate,basicElements);
+        RentSchedule mainRentScheduleTemp = new ModelFactory().getBasicModel(algTemplate,basicElements);
 
-        RentSchedule rentSchedule = rentScheduleRepository.findById(id).get();
+        RentSchedule mainRentSchedule = mainRentScheduleRepository.findById(id).get();
 
-        rentSchedule.setRentCells(rentScheduleTemp.getRentCells());
-        rentSchedule.setCurrentRentSum(rentScheduleTemp.getCurrentRentSum());
-        rentSchedule.setExcludingTaxInterestSum(rentScheduleTemp.getExcludingTaxInterestSum());
-        rentSchedule.setExcludingTaxPrincipalSum(rentScheduleTemp.getExcludingTaxPrincipalSum());
-        rentSchedule.setExcludingTaxXIRR(rentScheduleTemp.getExcludingTaxXIRR());
-        rentSchedule.setInterestSum(rentScheduleTemp.getInterestSum());
-        rentSchedule.setInterestVATSum(rentScheduleTemp.getInterestVATSum());
-        rentSchedule.setPrincipalSum(rentScheduleTemp.getPrincipalSum());
-        rentSchedule.setPrincipalVATSum(rentScheduleTemp.getPrincipalVATSum());
-        rentSchedule.setXIRR(rentScheduleTemp.getXIRR());
-        rentSchedule.setAccountingIRR(rentScheduleTemp.getAccountingIRR());
-        rentSchedule.setExcludingTaxIRR(rentScheduleTemp.getExcludingTaxIRR());
-        rentSchedule.setIRR(rentScheduleTemp.getIRR());
+        mainRentSchedule.setRentCells(mainRentScheduleTemp.getRentCells());
+        mainRentSchedule.setCurrentRentSum(mainRentScheduleTemp.getCurrentRentSum());
+        mainRentSchedule.setExcludingTaxInterestSum(mainRentScheduleTemp.getExcludingTaxInterestSum());
+        mainRentSchedule.setExcludingTaxPrincipalSum(mainRentScheduleTemp.getExcludingTaxPrincipalSum());
+        mainRentSchedule.setExcludingTaxXIRR(mainRentScheduleTemp.getExcludingTaxXIRR());
+        mainRentSchedule.setInterestSum(mainRentScheduleTemp.getInterestSum());
+        mainRentSchedule.setInterestVATSum(mainRentScheduleTemp.getInterestVATSum());
+        mainRentSchedule.setPrincipalSum(mainRentScheduleTemp.getPrincipalSum());
+        mainRentSchedule.setPrincipalVATSum(mainRentScheduleTemp.getPrincipalVATSum());
+        mainRentSchedule.setXIRR(mainRentScheduleTemp.getXIRR());
+        mainRentSchedule.setAccountingIRR(mainRentScheduleTemp.getAccountingIRR());
+        mainRentSchedule.setExcludingTaxIRR(mainRentScheduleTemp.getExcludingTaxIRR());
+        mainRentSchedule.setIRR(mainRentScheduleTemp.getIRR());
 
-        return this.saveRentSchedule(rentSchedule);
+        return this.saveRentSchedule(mainRentSchedule);
 
     }
+
+    public RentSchedule setElementsExcludingRentCells(RentSchedule mainRentSchedule){
+        mainRentSchedule.setXIRR(new XIRR()
+                .getXIRR(mainRentSchedule.getRentCells(),mainRentSchedule.getHandlingFee()
+                        ,mainRentSchedule.getMargin(),mainRentSchedule.getPurchasePrice(),mainRentSchedule.getPrincipal()));      //计算整体的XIRR
+
+        mainRentSchedule.setExcludingTaxXIRR(new ExcludingTaxXIRR()
+                .getExcludingTaxXIRR(mainRentSchedule.rentCells,mainRentSchedule.getHandlingFee()
+                        ,mainRentSchedule.getMargin(),mainRentSchedule.getPurchasePrice(),mainRentSchedule.firstTax,mainRentSchedule.lastTax));   //计算整体的不含税XIRR
+
+        mainRentSchedule.setPrincipalSum(new PrincipalSum()
+                .getPrincipalSum(mainRentSchedule.getRentCells()));  //计算本金之和
+
+        mainRentSchedule.setCurrentRentSum(new CurrentSum()
+                .getCurrentSum(mainRentSchedule.getRentCells()));    //计算所有租金之和
+
+        mainRentSchedule.setInterestSum(new InterestSum()
+                .getInterestSum(mainRentSchedule.getRentCells()));    //计算所有利息之和
+
+        mainRentSchedule.setExcludingTaxPrincipalSum(new ExcludingTaxPrincipalSum()
+                .getExcludingTaxPrincipalSum(mainRentSchedule.getRentCells())); //计算所有不含税本金之和
+
+        mainRentSchedule.setExcludingTaxInterestSum(new ExcludingTaxInterestSum()
+                .getExcludingTaxInterestSum(mainRentSchedule.getRentCells()));   //计算所有不含税利息之和
+
+        mainRentSchedule.setPrincipalVATSum(new PrincipalVATSum()
+                .getPrincipalVATSum(mainRentSchedule.getRentCells()));   //计算所有本金增值税之和
+
+        mainRentSchedule.setInterestVATSum(new InterestVATSum()
+                .getInterestVATSum(mainRentSchedule.getRentCells()));   //计算所有利息增值税之和
+        return mainRentSchedule;
+    }
+
+
+
+
+
 
     /**
      * 暂存
@@ -165,18 +227,18 @@ public class RentService {
 
     /**
      * 保存租金计划表到数据库
-     * @param rentSchedule
+     * @param mainRentSchedule
      */
-    public RentSchedule saveRentSchedule(RentSchedule rentSchedule){
-        logger.info("save rentSchedule");
-        return rentScheduleRepository.save(rentSchedule);
+    public RentSchedule saveRentSchedule(RentSchedule mainRentSchedule){
+        logger.info("save mainRentSchedule");
+        return mainRentScheduleRepository.save(mainRentSchedule);
     }
 
 
     public JSONArray trackRentScheduleChangesWithJavers(String contractId){
-        RentSchedule rentSchedule = rentScheduleRepository.getRentScheduleByContractId(contractId);
+        RentSchedule mainRentSchedule = mainRentScheduleRepository.getRentScheduleByContractId(contractId);
         JSONArray jsonArray = new JSONArray();
-        JqlQuery jqlQuery = QueryBuilder.byInstance(rentSchedule).build();
+        JqlQuery jqlQuery = QueryBuilder.byInstance(mainRentSchedule).build();
         List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery);
         for (CdoSnapshot snapshot : snapshots) {
             JSONObject jsonObject = new JSONObject();
@@ -188,8 +250,8 @@ public class RentService {
     }
 
     public RentSchedule getRentScheduleWithJaversCommitId(String contractId, String commitId){
-        RentSchedule rentSchedule = rentScheduleRepository.getRentScheduleByContractId(contractId);
-        JqlQuery jqlQuery = QueryBuilder.byInstance(rentSchedule).build();
+        RentSchedule mainRentSchedule = mainRentScheduleRepository.getRentScheduleByContractId(contractId);
+        JqlQuery jqlQuery = QueryBuilder.byInstance(mainRentSchedule).build();
         List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery);
         for (CdoSnapshot snapshot : snapshots) {
             if (snapshot.getCommitId().getMajorId() == Integer.parseInt(commitId))

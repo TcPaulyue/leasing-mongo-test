@@ -28,7 +28,7 @@ public class DateSet {
         DateTime dt = new DateTime(basicElements.getStartDate());
         dateList.add(dt);
         for(int i=0;i<times-1;i++){
-            DateTime temp =dt.plusMonths(3);
+            DateTime temp =dt.plusMonths(basicElements.getRentalFrequency());
             dt = temp;
             DateTime temp1 = new DateTime(temp.getYear(),temp.getMonthOfYear(),basicElements.getRepaymentDate(),0,0,0);
             dateList.add(temp1);

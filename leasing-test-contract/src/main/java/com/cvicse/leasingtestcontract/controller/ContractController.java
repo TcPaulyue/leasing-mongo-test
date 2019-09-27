@@ -26,7 +26,7 @@ public class ContractController {
     private static final Logger logger = LoggerFactory.getLogger(ContractController.class);
 
     @GetMapping
-    public List<Contract> getContracts() {
+    public List<Contract> getContracts() throws ContractNotFoundException{
         logger.info("All contracts requested.");
         return contractService.getAllContract();
     }

@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 
 @Component
+/**
+ * 不含税利息之和
+ */
 public class ExcludingTaxInterestSum {
     public double getExcludingTaxInterestSum(ArrayList<RentCell> rentCells){
         double sum = 0;

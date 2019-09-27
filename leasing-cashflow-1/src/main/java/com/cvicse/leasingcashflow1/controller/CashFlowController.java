@@ -44,14 +44,13 @@ public class CashFlowController {
 
 
     @PostMapping("/new")
-    public CashFlow createCashFlowByContractId(@RequestParam(value = "contractId", defaultValue = "null") String contractId
-            ,@RequestBody String name){
+    public CashFlow createCashFlowByContractId(@RequestParam(value = "contractId", defaultValue = "null") String contractId){
         if(contractId.equals("null")){
             logger.info("create cashFlow without contractId");
-            return cashFlowService.createCashFlow(name);
+            return cashFlowService.createCashFlow();
         }else{
             logger.info("create cashFlow by contractId");
-            return cashFlowService.createCashFlowByContractId(contractId,name);
+            return cashFlowService.createCashFlowByContractId(contractId);
         }
     }
 

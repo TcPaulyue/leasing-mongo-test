@@ -57,19 +57,21 @@ public class CashFlowService {
     }
 
 
-    public CashFlow createCashFlow(String name){
+    public CashFlow createCashFlow(){
         CashFlow cashFlow = new CashFlow();
-        cashFlow.setName(name);
-        return cashFlowRepository.save(cashFlow);
+        CashFlow cashFlow1 =cashFlowRepository.save(cashFlow);
+        cashFlow1.setName(cashFlow1.getId());
+        return cashFlowRepository.save(cashFlow1);
     }
 
 
-    public CashFlow createCashFlowByContractId(String id,String name){
+    public CashFlow createCashFlowByContractId(String id){
         logger.info("create cashFlow service");
         CashFlow cashFlow = new CashFlow();
         cashFlow.setContractId(id);
-        cashFlow.setName(name);
-        return cashFlowRepository.save(cashFlow);
+        CashFlow cashFlow1 =cashFlowRepository.save(cashFlow);
+        cashFlow1.setName(cashFlow1.getId());
+        return cashFlowRepository.save(cashFlow1);
     }
 
     /**

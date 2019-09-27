@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
 import javax.security.auth.login.Configuration;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -39,10 +40,15 @@ public class ContractService {
   return null;
     }
 
-    public List<Contract> getAllContract() {
+    public List<Contract> getAllContract() throws ContractNotFoundException {
         logger.info("contracts returned");
         List<Contract> contracts = contractRepository.findAll();
-        return contracts;
+        List<Contract> contractList = new ArrayList<>();
+        for(Contract contract:contracts){
+           Contract contract1 = this.getContract(contract.getId());
+           contractList.add(contract1);
+        }
+        return contractList;
     }
 
 
@@ -50,20 +56,24 @@ public class ContractService {
     public Contract getContract(String id) throws ContractNotFoundException {
         if (!this.contractRepository.findById(id).isPresent())
             throw new ContractNotFoundException("ContractRequest Not Found in contractRepository.");
-       // return this.contractRepository.findById(id).get();
         List<AggregationOperation> operations = Lists.newArrayList();
         operations.add(Aggregation.match(Criteria.where("_id").is(id)));
+        
         //operations.add(Aggregation.lookup("CashFlow","content.content1","_id","content.content1"));
         LookupOperation lookupOperation = LookupOperation.newLookup().from("CashFlow")
                 .localField("content.cashFlowId")
                 .foreignField("name")
                 .as("content.cashFlowId");
         operations.add(lookupOperation);
+
+
         LookupOperation lookupOperation1 = LookupOperation.newLookup().from("RentSchedule")
                 .localField("content.rentScheduleId")
                 .foreignField("name")
                 .as("content.rentScheduleId");
         operations.add(lookupOperation1);
+
+
         //operations.add(Aggregation.project("_id").and("content.content1").as("content.cashFlow"));
         // operations.add(Aggregation.project().and("content.content2").as("content.cashFlow2"));
         Aggregation aggregation = Aggregation.newAggregation(operations);

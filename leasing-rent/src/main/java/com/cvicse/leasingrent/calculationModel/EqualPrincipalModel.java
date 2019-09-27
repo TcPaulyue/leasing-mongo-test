@@ -26,8 +26,11 @@ public class EqualPrincipalModel extends BasicModel {
         List<Integer> dateIntervals = new DateSet().getDateInterval(new DateSet().getDateSet(basicElements));
 
         RentSchedule rentSchedule = new RentSchedule();
+
+
+        rentSchedule = this.initialDesignatedPrincipal(rentSchedule,basicElements);  //初始化三金
         //插入第一行初始化的数据
-        rentSchedule.getRentCells().add(this.initialDesignatedPrincipal(basicElements));
+        //rentSchedule.getRentCells().add(this.initialDesignatedPrincipal(basicElements));
 
         double count =0;
         for(int i=1;i<dateIntervals.size();i++) {
@@ -63,7 +66,8 @@ public class EqualPrincipalModel extends BasicModel {
 
             rentSchedule.getRentCells().add(rentCell);
         }
-        this.setCommonElements(rentSchedule);
+//        this.setCommonElements(rentSchedule,basicElements.getInputTaxRate(),basicElements.getPrincipalInterestRate()
+//                ,basicElements.getPrincipal());
         return rentSchedule;
         }
 }

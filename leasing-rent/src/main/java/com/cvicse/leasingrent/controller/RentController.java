@@ -32,9 +32,11 @@ public class RentController {
     }
 
     @PostMapping("/calc")
-    public RentSchedule createRentSchedule(@RequestBody JSONObject params){
+    public RentSchedule calcRentSchedule(@RequestBody JSONObject params
+    ,@RequestParam(value = "withmargin",defaultValue = "true") String withmargin){
         logger.info("pure calculation");
-        return rentService.calculateRentSchedule(params);
+        return rentService.calculateRentSchedule(params,withmargin);
+
     }
 
     @GetMapping

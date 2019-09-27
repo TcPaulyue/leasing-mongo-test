@@ -21,8 +21,10 @@ public class EqualInterestModel extends BasicModel {
         List<Integer> dateIntervals = new DateSet().getDateInterval(new DateSet().getDateSet(basicElements));
 
         RentSchedule rentSchedule = new RentSchedule();
+
+        rentSchedule = this.initialDesignatedPrincipal(rentSchedule,basicElements);  //初始化三金
         //插入第一行初始化的数据
-        rentSchedule.getRentCells().add(this.initialDesignatedPrincipal(basicElements));
+        //rentSchedule.getRentCells().add(this.initialDesignatedPrincipal(basicElements));
 
         double count =0;
         for(int i=1;i<dateIntervals.size();i++) {
@@ -40,6 +42,7 @@ public class EqualInterestModel extends BasicModel {
             rentCell.setCurrentRent(interest+principal);          //导入当期租金
 
             count = count+ principal;
+
             rentCell.setRemainingPrincipal(basicElements.getPrincipal()-count);   //剩余本金
 
             rentCell.setInterestVAT(new InterestVAT().getInterestVAT(interest,basicElements.getPrincipalInterestRate())); //计算利息增值税
@@ -57,7 +60,6 @@ public class EqualInterestModel extends BasicModel {
 
             rentSchedule.getRentCells().add(rentCell);
         }
-        this.setCommonElements(rentSchedule);
         return rentSchedule;
     }
 }

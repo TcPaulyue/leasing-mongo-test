@@ -11,7 +11,15 @@ public class RentSchedule {
     @Id
     private String id;
 
+    private String name;
+
     private String contractId;   //合同Id
+
+    private double principal;   //本金
+
+    public double firstTax;  //三金税
+
+    public double lastTax;
 
 
     public ArrayList<RentCell> rentCells = new ArrayList<>();
@@ -28,6 +36,50 @@ public class RentSchedule {
     private double excludingTaxIRR;     //不含税IRR
     private double accountingIRR;      //会计IRR
 
+    private double handlingFee;    //手续费  例如：4000000.00
+    private double margin;         //保证金  例如：24400000.00
+    private double purchasePrice;  //留购价款  例如：1000.00
+
+
+    public double getPrincipal() {
+        return principal;
+    }
+
+    public void setPrincipal(double principal) {
+        this.principal = principal;
+    }
+
+    public double getHandlingFee() {
+        return handlingFee;
+    }
+
+    public void setHandlingFee(double handlingFee) {
+        this.handlingFee = handlingFee;
+    }
+
+    public double getPurchasePrice() {
+        return purchasePrice;
+    }
+
+    public void setPurchasePrice(double purchasePrice) {
+        this.purchasePrice = purchasePrice;
+    }
+
+    public double getMargin() {
+        return margin;
+    }
+
+    public void setMargin(double margin) {
+        this.margin = margin;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
 
     public String getContractId() {
         return contractId;

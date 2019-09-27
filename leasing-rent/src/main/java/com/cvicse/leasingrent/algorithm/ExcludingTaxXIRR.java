@@ -13,16 +13,16 @@ public class ExcludingTaxXIRR {
     /**
      * 计算整体的不含税XIRR
      */
-    public double getExcludingTaxXIRR(ArrayList<RentCell> rentCells,double rate){
+    public double getExcludingTaxXIRR(ArrayList<RentCell> rentCells,double handlingFee
+            ,double margin,double purchasePrice,double firstTax,double lastTax){
         List<Transaction> transactionList = new ArrayList<>();
         for(RentCell rentCell : rentCells){
             transactionList.add(new Transaction(rentCell.getExcludingTaxXIRR(), rentCell.getPayDate().toDate()));
         }
-        RentCell rentCell = rentCells.get(rentCells.size()-1);
+        transactionList.add(new Transaction(firstTax,rentCells.get(0).getPayDate().toDate()));
 
-        double amount = rentCells.get(0).getPurchasePrice()-rentCells.get(0).getPurchasePrice()*rate/(1+rate);
-        transactionList.add(new Transaction(-rentCells.get(0).getMargin(),rentCell.getPayDate().toDate()));
-        transactionList.add(new Transaction(amount,rentCell.getPayDate().toDate()));
+        RentCell rentCell = rentCells.get(rentCells.size()-1);
+        transactionList.add(new Transaction(lastTax,rentCell.getPayDate().toDate()));
         double date = new Xirr(transactionList).xirr();
         return (double)Math.round(date*1000000)/1000000;
     }

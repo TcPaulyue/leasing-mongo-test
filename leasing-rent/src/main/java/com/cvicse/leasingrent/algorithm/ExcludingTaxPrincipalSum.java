@@ -8,7 +8,7 @@ import java.util.ArrayList;
 @Component
 public class ExcludingTaxPrincipalSum {
     /**
-     * 计算所有不含税本金
+     * 计算所有不含税本金之和
      * @param rentCells
      * @return
      */
